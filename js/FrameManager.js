@@ -1,5 +1,5 @@
 (function(exports){
-    exports.FrameManager = {
+    var FrameManager = {
 
         currentFrameId : '',
         currentFrameHeight : 0,
@@ -61,6 +61,8 @@
 
     };
 
-})(window);
+    setTimeout(FrameManager.init, 300);
 
-window.setTimeout(FrameManager.init, 300);
+    exports.FrameManager = FrameManager;
+
+})(window);
