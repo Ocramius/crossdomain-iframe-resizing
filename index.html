@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title></title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+    <body>
+        <div>This is the main window content</div>
+        <div style="border: 1px solid #000;">
+            <script type="text/javascript" src="js/FrameManager.js"></script>
+            <iframe
+                id="frame-one"
+                scrolling="no"
+                frameborder="0"
+                src="http://crossdomain-frames.localhost/frame.html"
+                onload="FrameManager.registerFrame(this)"
+            ></iframe>
+        </div>
+    </body>
+</html>
