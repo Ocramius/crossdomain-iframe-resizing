@@ -1,4 +1,4 @@
-(function(exports){
+(function(exports, $){
     var FrameManager = {
 
         currentFrameId : '',
@@ -7,18 +7,12 @@
         lastFrameHeight : 0,
         resizeTimerId : null,
 
-        init: function() {
-            if (FrameManager.resizeTimerId == null) {
-                FrameManager.resizeTimerId = window.setInterval(FrameManager.resizeFrames, 500);
-            }
-        },
-
         resizeFrames: function() {
             FrameManager.retrieveFrameIdAndHeight();
             if ((FrameManager.currentFrameId != FrameManager.lastFrameId) || (FrameManager.currentFrameHeight != FrameManager.lastFrameHeight)) {
                 var iframe = document.getElementById(FrameManager.currentFrameId.toString());
                 if (iframe == null) return;
-                iframe.style.height = FrameManager.currentFrameHeight.toString() + "px";
+                iframe.style.height = FrameManager.currentFrameHeight.toString() + 'px';
                 FrameManager.lastFrameId = FrameManager.currentFrameId;
                 FrameManager.lastFrameHeight = FrameManager.currentFrameHeight;
                 window.location.hash = '';
@@ -60,9 +54,16 @@
         }
 
     };
-
-    setTimeout(FrameManager.init, 300);
+    
+    $(function(){
+        $(window).bind('hashchange', function() {
+            FrameManager.resizeFrames();
+        });
+        $("iframe").each(function(){
+            FrameManager.registerFrame(this);
+        });
+    });
 
     exports.FrameManager = FrameManager;
 
-})(window);
+})(window, jQuery);

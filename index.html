@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title></title>
+        <title>Cross-Domain iframe autoresize - Main window</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
     </head>
     <body>
         <div>This is the main window content</div>
@@ -13,7 +14,6 @@
                 scrolling="no"
                 frameborder="0"
                 src="http://crossdomain-frames.localhost/frame.html"
-                onload="FrameManager.registerFrame(this)"
             ></iframe>
         </div>
     </body>

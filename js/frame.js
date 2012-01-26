@@ -27,7 +27,6 @@
     }
 
     var getBodyHeight = function() {
-
         var height,
             scrollHeight,
             offsetHeight;
@@ -90,7 +89,7 @@
                 });
             }
         }
-        var interval = setInterval(toggleFontSize, 5000);
+        setInterval(toggleFontSize, 3000);
     });
 
 })(jQuery);
