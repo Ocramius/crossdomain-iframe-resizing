@@ -17,7 +17,6 @@
                 iframe.style.height = FrameManager.currentFrameHeight.toString() + 'px';
                 FrameManager.lastFrameId = FrameManager.currentFrameId;
                 FrameManager.lastFrameHeight = FrameManager.currentFrameHeight;
-                //window.location.hash = 'FrameManager';
                 return true;
             }
             return false;
