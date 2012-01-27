@@ -1,5 +1,5 @@
 (function(exports, $){
-    
+
     var HeightPublisher = (function() {
         this.publishHeight = function() {
             if (window.location.hash.length == 0) return;
@@ -7,9 +7,9 @@
             if (frameId == '') {
                 return;
             }
-            var actualHeight = $(document).height();
+            var actualHeight = getBodyHeight();
             var currentHeight = getViewPortHeight();
-            if  (Math.abs(actualHeight - currentHeight) > 15) {
+            if  (Math.abs(actualHeight/currentHeight - 1) > 0.05) {
                 window.top.location = window.location.hash.substring(1)
                     + "#"
                     + 'frameId=' + frameId
@@ -26,6 +26,31 @@
                 frameId = frameId.substring(0, hashIndex);
             }
             return frameId;
+        }
+
+        var getBodyHeight = function() {
+            var height,
+                scrollHeight,
+                offsetHeight;
+            if (document.height) {
+                height = document.height;
+            } else if (document.body) {
+                if (document.body.scrollHeight) {
+                    height = scrollHeight = document.body.scrollHeight;
+                }
+                if (document.body.offsetHeight) {
+                    height = offsetHeight = document.body.offsetHeight;
+                }
+                if (scrollHeight && offsetHeight) {
+                    height = Math.max(scrollHeight, offsetHeight);
+                } else {
+                    height = $(document.body).height();
+                }
+                if (!height) {
+                    height = $(document).height();
+                }
+            }
+            return height;
         }
 
         var getViewPortHeight = function() {
@@ -56,7 +81,7 @@
 
         return this;
     })();
-    
+
     $(function(){
         var publishHeight = function() {
             HeightPublisher.publishHeight();
