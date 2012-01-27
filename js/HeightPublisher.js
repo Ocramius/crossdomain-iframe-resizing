@@ -7,7 +7,7 @@
             if (frameId == '') {
                 return;
             }
-            var actualHeight = getBodyHeight();
+            var actualHeight = $(document).height();
             var currentHeight = getViewPortHeight();
             if  (Math.abs(actualHeight - currentHeight) > 15) {
                 window.top.location = window.location.hash.substring(1)
@@ -26,26 +26,6 @@
                 frameId = frameId.substring(0, hashIndex);
             }
             return frameId;
-        }
-
-        var getBodyHeight = function() {
-            var height,
-                scrollHeight,
-                offsetHeight;
-            if (document.height) {
-                height = document.height;
-            } else if (document.body) {
-                if (document.body.scrollHeight) {
-                    height = scrollHeight = document.body.scrollHeight;
-                }
-                if (document.body.offsetHeight) {
-                    height = offsetHeight = document.body.offsetHeight;
-                }
-                if (scrollHeight && offsetHeight) {
-                    height = Math.max(scrollHeight, offsetHeight);
-                }
-            }
-            return height;
         }
 
         var getViewPortHeight = function() {
