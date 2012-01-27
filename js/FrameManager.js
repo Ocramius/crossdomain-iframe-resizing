@@ -17,7 +17,7 @@
                 iframe.style.height = FrameManager.currentFrameHeight.toString() + 'px';
                 FrameManager.lastFrameId = FrameManager.currentFrameId;
                 FrameManager.lastFrameHeight = FrameManager.currentFrameHeight;
-                window.location.hash = 'FrameManager';
+                //window.location.hash = 'FrameManager';
                 return true;
             }
             return false;
@@ -60,13 +60,26 @@
     };
     
     $(function(){
-        $(window).bind('hashchange', function(e) {
-            if(FrameManager.resizeFrames()) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
-        });
-        $("iframe").each(function(){
+        if (window.onhashchange) {
+            $(window).bind('hashchange', function(e) {
+                if (FrameManager.resizeFrames()) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (window.history && window.history.replaceState) {
+                        window.history.replaceState(
+                            null,
+                            null,
+                            '#FrameManager'
+                        );
+                    } else {
+                        window.location.hash = 'FrameManager';
+                    }
+                }
+            });
+        } else {
+            window.setInterval(FrameManager.resizeFrames, 300);
+        }
+        $('iframe').each(function(){
             FrameManager.registerFrame(this);
         });
     });
