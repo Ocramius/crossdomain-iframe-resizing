@@ -29,28 +29,7 @@
         }
 
         var getBodyHeight = function() {
-            var height,
-                scrollHeight,
-                offsetHeight;
-            if (document.height) {
-                height = document.height;
-            } else if (document.body) {
-                if (document.body.scrollHeight) {
-                    height = scrollHeight = document.body.scrollHeight;
-                }
-                if (document.body.offsetHeight) {
-                    height = offsetHeight = document.body.offsetHeight;
-                }
-                if (scrollHeight && offsetHeight) {
-                    height = Math.max(scrollHeight, offsetHeight);
-                } else {
-                    height = $(document.body).height();
-                }
-                if (!height) {
-                    height = $(document).height();
-                }
-            }
-            return height;
+            return $(document.body).outerHeight();
         }
 
         var getViewPortHeight = function() {
