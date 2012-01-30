@@ -10,8 +10,7 @@
             var actualHeight = getBodyHeight();
             var currentHeight = getViewPortHeight();
             if  (Math.abs(actualHeight/currentHeight - 1) > 0.05) {
-                window.top.location = window.location.hash.substring(1)
-                    + "#"
+                window.top.location.hash = "#"
                     + 'frameId=' + frameId
                     + '&'
                     + 'height=' + actualHeight.toString();
