@@ -1,4 +1,31 @@
-(function(exports, $){
+(function(exports, $) {
+
+    var parseQueryString = function (queryString) {
+        queryString = new String(queryString);
+        var urlParams = {},
+            e,
+            a = /\+/g,  // Regex for replacing addition symbol with a space
+            r = /([^&=]+)=?([^&]*)/g,
+            d = function (s) {return decodeURIComponent(s.replace(a, " "));};
+
+        while (e = r.exec(queryString)) {
+            urlParams[d(e[1])] = d(e[2]);
+        }
+        return urlParams;
+    };
+
+    var buildQueryString = function(parameters) {
+        var qs = '';
+        for(var key in parameters) {
+            var value = parameters[key];
+            qs += encodeURIComponent(key) + '=' + encodeURIComponent(value) + '&';
+        }
+        if (qs.length > 0){
+            qs = qs.substring(0, qs.length-1);
+        }
+        return qs;
+    };
+
     var FrameManager = {
 
         currentFrameId : '',
@@ -24,26 +51,19 @@
 
         retrieveFrameIdAndHeight: function() {
             if (window.location.hash.length == 0) return;
-            var hashValue = window.location.hash.substring(1);
-            if ((hashValue == null) || (hashValue.length == 0)) return;
-            var pairs = hashValue.split('&');
-            if ((pairs != null) && (pairs.length > 0)) {
-                for(var i = 0; i < pairs.length; i++) {
-                    var pair = pairs[i].split('=');
-                    if ((pair != null) && (pair.length > 0)) {
-                        if (pair[0] == 'frameId') {
-                            if ((pair[1] != null) && (pair[1].length > 0)) {
-                                FrameManager.currentFrameId = pair[1];
-                            }
-                        } else if (pair[0] == 'height') {
-                            var height = parseInt(pair[1]);
-                            if (!isNaN(height)) {
-                                FrameManager.currentFrameHeight = height;
-                                FrameManager.currentFrameHeight += 15;
-                            }
-                        }
-                    }
-                }
+            var hashValue = new String(window.location.hash.substring(1));
+            var queryParams = parseQueryString(hashValue);
+            if(
+                typeof queryParams['frameId'] != 'undefined'
+                && queryParams['frameId']
+            ) {
+                FrameManager.currentFrameId = queryParams['frameId'];
+            }
+            if(
+                typeof queryParams['height'] != 'undefined'
+                && queryParams['height']
+            ) {
+                FrameManager.currentFrameHeight = parseInt(queryParams['height']) + 15;
             }
         },
 
@@ -53,7 +73,18 @@
             if (hashIndex > -1) {
                 currentLocation = currentLocation.substring(0, hashIndex);
             }
-            frame.contentWindow.location = frame.src + '?frameId=' + frame.id + '#' + currentLocation;
+            var src = new String(frame.src);
+            var params = {};
+            if(src.indexOf('?') >= 0) {
+                var qs = src.split('?')[1];
+                src = src.split('?')[0];
+                qs = qs.split('#')[0];
+                params = parseQueryString(qs);
+            }
+            params['frameId'] = frame.id;
+            frame.contentWindow.location = src 
+                + '?' + buildQueryString(params)
+                + '#' + currentLocation;
         }
 
     };

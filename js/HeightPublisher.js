@@ -1,4 +1,4 @@
-(function(exports, $){
+(function(exports, $) {
 
     var HeightPublisher = (function() {
 
@@ -19,26 +19,27 @@
                 }
                 if(lastLocation != '') {
                     window.top.location = lastLocation + '#'
-                        + 'frameId=' + frameId
-                        + '&'
-                        + 'height=' + actualHeight.toString();
+                        + buildQueryString({
+                            frameId: frameId,
+                            height: actualHeight.toString()
+                        });
                 }
             }
         };
 
         var getFrameId = function() {
-            var qs = parseQueryString(window.location.href);
+            var qs = parseQueryString(window.location.search.substring(1));
             var frameId = qs['frameId'];
-            var hashIndex = frameId.indexOf('#');
+            var hashIndex = (typeof frameId == "string") ? frameId.indexOf('#') : -1;
             if (hashIndex > -1) {
                 frameId = frameId.substring(0, hashIndex);
             }
             return frameId;
-        }
+        };
 
         var getBodyHeight = function() {
             return $(document.body).outerHeight();
-        }
+        };
 
         var getViewPortHeight = function() {
             var height = 0;
@@ -50,21 +51,33 @@
                 height = document.body.clientHeight;
             }
             return height;
-        }
+        };
 
-        var parseQueryString = function(url) {
-            url = new String(url);
-            var queryStringValues = new Object(),
-                querystring = url.substring((url.indexOf('?') + 1), url.length),
-                querystringSplit = querystring.split('&');
-            for (i = 0; i < querystringSplit.length; i++) {
-                var pair = querystringSplit[i].split('='),
-                    name = pair[0],
-                    value = pair[1];
-                queryStringValues[name] = value;
+        var parseQueryString = function (queryString) {
+            queryString = new String(queryString);
+            var urlParams = {},
+                e,
+                a = /\+/g,  // Regex for replacing addition symbol with a space
+                r = /([^&=]+)=?([^&]*)/g,
+                d = function (s) { return decodeURIComponent(s.replace(a, " ")); };
+
+            while (e = r.exec(queryString)) {
+                urlParams[d(e[1])] = d(e[2]);
             }
-            return queryStringValues;
-        }
+            return urlParams;
+        };
+
+        var buildQueryString = function(parameters) {
+            var qs = '';
+            for(var key in parameters) {
+                var value = parameters[key];
+                qs += encodeURIComponent(key) + '=' + encodeURIComponent(value) + '&';
+            }
+            if (qs.length > 0){
+                qs = qs.substring(0, qs.length-1); //chop off last "&"
+            }
+            return qs;
+        };
 
         return this;
     })();
