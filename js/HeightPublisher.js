@@ -45,9 +45,12 @@
             var height = 0;
             if (window.innerHeight) {
                 height = window.innerHeight - 18;
-            } else if ((document.documentElement) && (document.documentElement.clientHeight)) {
+            } else if (
+                document.documentElement
+                && document.documentElement.clientHeight
+            ) {
                 height = document.documentElement.clientHeight;
-            } else if ((document.body) && (document.body.clientHeight)) {
+            } else if (document.body && document.body.clientHeight) {
                 height = document.body.clientHeight;
             }
             return height;
@@ -80,6 +83,7 @@
         };
 
         return this;
+
     })();
 
     $(function(){
