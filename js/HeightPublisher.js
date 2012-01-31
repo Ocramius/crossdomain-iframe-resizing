@@ -1,6 +1,9 @@
 (function(exports, $){
 
     var HeightPublisher = (function() {
+
+        var lastLocation = '';
+        
         this.publishHeight = function() {
             if (window.location.hash.length == 0) return;
             var frameId = getFrameId();
@@ -10,10 +13,16 @@
             var actualHeight = getBodyHeight();
             var currentHeight = getViewPortHeight();
             if  (Math.abs(actualHeight/currentHeight - 1) > 0.05) {
-                window.top.location.hash = "#"
-                    + 'frameId=' + frameId
-                    + '&'
-                    + 'height=' + actualHeight.toString();
+                // unsafe check, should be stricter
+                if(window.location.hash.substring(1).indexOf('http') >= 0) {
+                    lastLocation = window.location.hash.substring(1);
+                }
+                if(lastLocation != '') {
+                    window.top.location = lastLocation + '#'
+                        + 'frameId=' + frameId
+                        + '&'
+                        + 'height=' + actualHeight.toString();
+                }
             }
         };
 
