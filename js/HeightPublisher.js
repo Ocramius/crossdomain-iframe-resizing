@@ -3,6 +3,7 @@
     var HeightPublisher = (function() {
 
         var lastLocation = '';
+        var currentFrameId = null;
         
         this.publishHeight = function() {
             if (window.location.hash.length == 0) return;
@@ -14,27 +15,30 @@
             var currentHeight = getViewPortHeight();
             if  (Math.abs(actualHeight/currentHeight - 1) > 0.05) {
                 // unsafe check, should be stricter
-                if(window.location.hash.substring(1).indexOf('http') >= 0) {
-                    lastLocation = window.location.hash.substring(1);
+                var params = parseQueryString(window.location.hash.substring(1));
+                if(
+                    typeof params['lastLocation'] != 'undefined'
+                    && params['lastLocation']
+                ) {
+                    lastLocation = params['lastLocation'];
                 }
-                if(lastLocation != '') {
-                    window.top.location = lastLocation + '#'
-                        + buildQueryString({
-                            frameId: frameId,
-                            height: actualHeight.toString()
-                        });
+                if (lastLocation != '') {
+                    params['lastLocation'] = lastLocation;
+                    params['frameId'] = frameId;
+                    params['height'] = actualHeight.toString();
+                    window.top.location = lastLocation + '#' + buildQueryString(params);
                 }
             }
         };
 
         var getFrameId = function() {
-            var qs = parseQueryString(window.location.search.substring(1));
+            //var qs = parseQueryString(window.location.search.substring(1));
+            var qs = parseQueryString(window.location.hash.substring(1));
             var frameId = qs['frameId'];
-            var hashIndex = (typeof frameId == "string") ? frameId.indexOf('#') : -1;
-            if (hashIndex > -1) {
-                frameId = frameId.substring(0, hashIndex);
+            if(frameId) {
+                currentFrameId = frameId;
             }
-            return frameId;
+            return currentFrameId;
         };
 
         var getBodyHeight = function() {
