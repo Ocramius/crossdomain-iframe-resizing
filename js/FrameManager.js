@@ -75,9 +75,9 @@
             }
             var src = new String(frame.src);
             var params = {};
+            src = src.split('#')[0];
             if(src.indexOf('?') >= 0) {
                 var qs = src.split('?')[1];
-                //src = src.split('?')[0];
                 qs = qs.split('#')[0];
                 params = parseQueryString(qs);
             }
@@ -85,7 +85,6 @@
             params['lastLocation'] = currentLocation;
             frame.contentWindow.location = src 
                 + '#' + buildQueryString(params);
-                //+ '#' + currentLocation;
         }
 
     };
