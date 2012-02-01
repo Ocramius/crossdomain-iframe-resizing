@@ -1,31 +1,5 @@
 (function(exports, $) {
 
-    var parseQueryString = function (queryString) {
-        queryString = new String(queryString);
-        var urlParams = {},
-            e,
-            a = /\+/g,  // Regex for replacing addition symbol with a space
-            r = /([^&=]+)=?([^&]*)/g,
-            d = function (s) {return decodeURIComponent(s.replace(a, " "));};
-
-        while (e = r.exec(queryString)) {
-            urlParams[d(e[1])] = d(e[2]);
-        }
-        return urlParams;
-    };
-
-    var buildQueryString = function(parameters) {
-        var qs = '';
-        for(var key in parameters) {
-            var value = parameters[key];
-            qs += encodeURIComponent(key) + '=' + encodeURIComponent(value) + '&';
-        }
-        if (qs.length > 0){
-            qs = qs.substring(0, qs.length-1);
-        }
-        return qs;
-    };
-
     var FrameManager = {
 
         currentFrameId : '',
@@ -52,7 +26,7 @@
         retrieveFrameIdAndHeight: function() {
             if (window.location.hash.length == 0) return;
             var hashValue = new String(window.location.hash.substring(1));
-            var queryParams = parseQueryString(hashValue);
+            var queryParams = EncoderTools.parseHashParams(hashValue);
             if(
                 typeof queryParams['frameId'] != 'undefined'
                 && queryParams['frameId']
@@ -68,7 +42,7 @@
         },
 
         registerFrame: function(frame) {
-            var currentLocation = location.href;
+            var currentLocation = window.location.href;
             var hashIndex = currentLocation.indexOf('#');
             if (hashIndex > -1) {
                 currentLocation = currentLocation.substring(0, hashIndex);
@@ -79,12 +53,11 @@
             if(src.indexOf('?') >= 0) {
                 var qs = src.split('?')[1];
                 qs = qs.split('#')[0];
-                params = parseQueryString(qs);
+                params = EncoderTools.parseHashParams(qs);
             }
             params['frameId'] = frame.id;
             params['lastLocation'] = currentLocation;
-            frame.contentWindow.location = src 
-                + '#' + buildQueryString(params);
+            frame.contentWindow.location = src + '#' + EncoderTools.buildHashParams(params);
         }
 
     };

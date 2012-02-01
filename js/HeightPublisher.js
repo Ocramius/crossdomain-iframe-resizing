@@ -14,8 +14,7 @@
             var actualHeight = getBodyHeight();
             var currentHeight = getViewPortHeight();
             if  (Math.abs(actualHeight/currentHeight - 1) > 0.05) {
-                // unsafe check, should be stricter
-                var params = parseQueryString(window.location.hash.substring(1));
+                var params = EncoderTools.parseHashParams(window.location.hash.substring(1));
                 if(
                     typeof params['lastLocation'] != 'undefined'
                     && params['lastLocation']
@@ -26,14 +25,13 @@
                     params['lastLocation'] = lastLocation;
                     params['frameId'] = frameId;
                     params['height'] = actualHeight.toString();
-                    window.top.location = lastLocation + '#' + buildQueryString(params);
+                    window.parent.location = lastLocation + '#' + EncoderTools.buildHashParams(params);
                 }
             }
         };
 
         var getFrameId = function() {
-            //var qs = parseQueryString(window.location.search.substring(1));
-            var qs = parseQueryString(window.location.hash.substring(1));
+            var qs = EncoderTools.parseHashParams(window.location.hash.substring(1));
             var frameId = qs['frameId'];
             if(frameId) {
                 currentFrameId = frameId;
@@ -60,32 +58,6 @@
             return height;
         };
 
-        var parseQueryString = function (queryString) {
-            queryString = new String(queryString);
-            var urlParams = {},
-                e,
-                a = /\+/g,  // Regex for replacing addition symbol with a space
-                r = /([^&=]+)=?([^&]*)/g,
-                d = function (s) { return decodeURIComponent(s.replace(a, " ")); };
-
-            while (e = r.exec(queryString)) {
-                urlParams[d(e[1])] = d(e[2]);
-            }
-            return urlParams;
-        };
-
-        var buildQueryString = function(parameters) {
-            var qs = '';
-            for(var key in parameters) {
-                var value = parameters[key];
-                qs += encodeURIComponent(key) + '=' + encodeURIComponent(value) + '&';
-            }
-            if (qs.length > 0){
-                qs = qs.substring(0, qs.length-1); //chop off last "&"
-            }
-            return qs;
-        };
-
         return this;
 
     })();
@@ -93,7 +65,7 @@
     $(function(){
         var publishHeight = function() {
             HeightPublisher.publishHeight();
-            window.setTimeout(publishHeight, 100);
+            window.setTimeout(publishHeight, 500);
         }
         publishHeight();
     });
