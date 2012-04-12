@@ -4,12 +4,21 @@
         <title>Cross-Domain iframe autoresize - Iframe</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+        <script type="text/javascript" src="jquery-cookie/jquery.cookie.js"></script>
         <script type="text/javascript" src="js/EncoderTools.js"></script>
         <script type="text/javascript" src="js/HeightPublisher.js"></script>
         <script type="text/javascript" src="js/resize-frame-text.js"></script>
     </head>
     <body>
         <div>This is the frame window content</div>
+        <ul>
+            <li>
+                <a href="frame.html">Link without hash</a>
+            </li>
+            <li>
+                <a href="frame.html#aaaah">Link with hash</a>
+            </li>
+        </ul>
         <div id="content">
             Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
             Fusce in tortor sit amet sem luctus ornare.
