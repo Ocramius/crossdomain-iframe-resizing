@@ -18,7 +18,6 @@
             var hashString = EncoderTools.buildHashParams(hashParams);
             $.cookie(cookieName, hashString, cookieOptions);
             window.parent.location = hashParams['lastLocation'] + '#' + hashString;
-            console.log(hashParams)
         };
 
         this.read = function () {
