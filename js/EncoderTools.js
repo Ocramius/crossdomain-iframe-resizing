@@ -106,7 +106,9 @@
                 r = /([^&=]+)=?([^&]*)/g,
                 d = function (s) {return decodeURIComponent(s.replace(a, " "));};
             while (e = r.exec(queryString)) {
-                urlParams[d(e[1])] = d(e[2]);
+                if (e[2]) {
+                    urlParams[d(e[1])] = d(e[2]);
+                }
             }
             return urlParams;
         };
