@@ -139,7 +139,6 @@
                 var $a = $(this);
                 var href = $a.attr('href');
                 var params = HeightPublisher.getHashParams();
-                console.log(href, href.indexOf("#"), params);
                 if (
                     href
                     && params
