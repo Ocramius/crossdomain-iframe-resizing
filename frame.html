@@ -16,11 +16,17 @@
                 <a href="frame2.html">Link without hash</a>
             </li>
             <li>
-                <a href="frame2.html#aaaah">Link with hash</a>
+                <a href="frame2.html#aaaah">Link with hash (hash is maintained) </a>
+            </li>
+            <li>
+                <a href="frame2.html" target="_blank">target="_blank" link (no hash provided when clicked, should be broken as cookie causes mess)</a>
+            </li>
+            <li>
+                <a href="frame2.html" target="_self">target="_self" link</a>
             </li>
         </ul>
         <div id="content">
-            FRAME 1!
+            <strong>FRAME 1!</strong>
             <br/>
             Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
             Fusce in tortor sit amet sem luctus ornare.
