@@ -142,6 +142,10 @@
                 if (
                     href
                     && params
+                    && (
+                        !$a.attr('target')
+                        || ($a.attr('target') === '_self')
+                    )
                     && (href.indexOf("#") < 0)
                 ) {
                     e.preventDefault();
