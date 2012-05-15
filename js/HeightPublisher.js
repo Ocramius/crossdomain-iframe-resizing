@@ -44,8 +44,8 @@
             };
 
         this.getHashParams = function (params) {
-            params = params || {};
-            return EncoderTools.buildHashParams($.extend({}, this.read(), params));
+            var parameters = params || {};
+            return EncoderTools.buildHashParams($.extend({}, this.read(), parameters));
         };
 
         /**
@@ -55,13 +55,13 @@
          * @return {Boolean} true on success
          */
         this.publish = function (params) {
-            params = params || {};
             var hashString,
-                hashParams = this.read();
+                hashParams = this.read(),
+                parameters = params || {};
             if (!hashParams.lastLocation) {
                 return false;
             }
-            hashString = this.getHashParams(params);
+            hashString = this.getHashParams(parameters);
             if (!hashString) {
                 return false;
             }
@@ -133,9 +133,10 @@
             function (e) {
                 var a = $(this),
                     href = a.attr('href'),
+                    target = !a.attr('target') || (a.attr('target') === '_self'),
                     params = heightPublisher.getHashParams(),
-                    targetSelf = !a.attr('target') || ('_self' === a.attr('target'));
-                if (href && params && targetSelf && href.indexOf("#")) {
+                    hasHash = href && (href.indexOf("#") >= 0);
+                if (!hasHash && params && target) {
                     e.preventDefault();
                     window.document.location.href = href +  "#" + params;
                 }
