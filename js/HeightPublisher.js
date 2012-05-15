@@ -87,7 +87,7 @@
          * Sends the current height to the parent window via hash parameters
          */
         this.publishHeight = function () {
-            var actualHeight, currentHeight, frameId = getFrameId();
+            var actualHeight, currentHeight, frameId = this.getFrameId();
             if (!frameId) {
                 return;
             }
