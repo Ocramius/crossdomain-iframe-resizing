@@ -10,7 +10,7 @@
 
         resizeFrames: function () {
             frameManager.retrieveFrameIdAndHeight();
-            if ((frameManager.currentFrameId != frameManager.lastFrameId) || (frameManager.currentFrameHeight != FrameManager.lastFrameHeight)) {
+            if ((frameManager.currentFrameId !== frameManager.lastFrameId) || (frameManager.currentFrameHeight !== frameManager.lastFrameHeight)) {
                 var iframe = window.document.getElementById(frameManager.currentFrameId.toString());
                 if (iframe === null) {
                     return true;
@@ -24,20 +24,20 @@
         },
 
         retrieveFrameIdAndHeight: function () {
-            if (window.location.hash.length == 0) {
+            if (window.location.hash.length === 0) {
                 return;
             }
 
-            var hashValue = new String(window.location.hash.substring(1)),
+            var hashValue = String(window.location.hash.substring(1)),
                 queryParams = EncoderTools.parseHashParams(hashValue);
             if (
-                typeof queryParams.frameId != 'undefined' &&
+                typeof queryParams.frameId !== 'undefined' &&
                     queryParams.frameId
             ) {
                 frameManager.currentFrameId = queryParams.frameId;
             }
             if (
-                typeof queryParams.height != 'undefined' &&
+                typeof queryParams.height !== 'undefined' &&
                     queryParams.height
             ) {
                 frameManager.currentFrameHeight = parseInt(queryParams.height, 10) + 15;
@@ -53,7 +53,7 @@
             if (hashIndex > -1) {
                 currentLocation = currentLocation.substring(0, hashIndex);
             }
-            src = new String(frame.src);
+            src = String(frame.src);
             params = {};
             src = src.split('#')[0];
             if (0 <= src.indexOf('?')) {
