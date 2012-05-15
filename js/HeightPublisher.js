@@ -1,5 +1,4 @@
 (function (window, exports, $, EncoderTools) {
-    "use strict";
 
     var heightPublisher = (function () {
 
@@ -13,19 +12,6 @@
             cookieOptions = {
                 expires: 7,
                 path: '/'
-            },
-
-            /**
-             * Retrieves the current frame id (frame id is assigned by parent window)
-             *
-             * @return {Number}|null
-             */
-            getFrameId = function () {
-                var qs = this.read();
-                if (qs.frameId) {
-                    currentFrameId = qs.frameId;
-                }
-                return currentFrameId;
             },
 
             /**
@@ -112,6 +98,19 @@
                     height: actualHeight.toString()
                 });
             }
+        };
+
+        /**
+         * Retrieves the current frame id (frame id is assigned by parent window)
+         *
+         * @return {Number}|null
+         */
+        this.getFrameId = function () {
+            var qs = this.read();
+            if (qs.frameId) {
+                currentFrameId = qs.frameId;
+            }
+            return currentFrameId;
         };
 
         return this;

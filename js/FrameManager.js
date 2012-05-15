@@ -1,5 +1,4 @@
 (function (window, exports, $, EncoderTools) {
-    "use strict";
 
     var frameManager = {
 
