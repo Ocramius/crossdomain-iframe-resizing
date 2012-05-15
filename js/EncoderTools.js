@@ -1,17 +1,17 @@
-(function(exports){
+(function (exports) {
 
-    var EncoderTools = (function(){
+    var encoderTools = (function () {
 
-        var _keyStr = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+        var keyStr = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
 
         this.utf8_encode = function (string) {
             string = string.replace(/\r\n/g, "\n");
-            var utftext = '';
-            for (var n = 0; n < string.length; n++) {
-                var c = string.charCodeAt(n);
+            var utftext = '', n, c;
+            for (n = 0; n < string.length; n += 1) {
+                c = string.charCodeAt(n);
                 if (c < 128) {
                     utftext += String.fromCharCode(c);
-                } else if((c > 127) && (c < 2048)) {
+                } else if ((c > 127) && (c < 2048)) {
                     utftext += String.fromCharCode((c >> 6) | 192);
                     utftext += String.fromCharCode((c & 63) | 128);
                 } else {
@@ -24,22 +24,20 @@
         };
 
         this.utf8_decode = function (utftext) {
-            var c, c1, c2, c3;
-            var string = '';
-            var i = 0;
+            var c, c1, c2, c3, string = '', i = 0;
             c = c1 = c2 = 0;
-            while ( i < utftext.length ) {
+            while (i < utftext.length ) {
                 c = utftext.charCodeAt(i);
                 if (c < 128) {
                     string += String.fromCharCode(c);
-                    i++;
-                } else if((c > 191) && (c < 224)) {
-                    c2 = utftext.charCodeAt(i+1);
+                    i += 1;
+                } else if ((c > 191) && (c < 224)) {
+                    c2 = utftext.charCodeAt(i + 1);
                     string += String.fromCharCode(((c & 31) << 6) | (c2 & 63));
                     i += 2;
                 } else {
-                    c2 = utftext.charCodeAt(i+1);
-                    c3 = utftext.charCodeAt(i+2);
+                    c2 = utftext.charCodeAt(i + 1);
+                    c3 = utftext.charCodeAt(i + 2);
                     string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
                     i += 3;
                 }
@@ -48,14 +46,15 @@
         };
 
         this.base64_encode = function (input) {
-            var output = '';
-            var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
-            var i = 0;
+            var output = '', chr1, chr2, chr3, enc1, enc2, enc3, enc4, i = 0;
             input = this.utf8_encode(input);
             while (i < input.length) {
-                chr1 = input.charCodeAt(i++);
-                chr2 = input.charCodeAt(i++);
-                chr3 = input.charCodeAt(i++);
+                chr1 = input.charCodeAt(i);
+                i += 1;
+                chr2 = input.charCodeAt(i);
+                i += 1;
+                chr3 = input.charCodeAt(i);
+                i += 1;
                 enc1 = chr1 >> 2;
                 enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
                 enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
@@ -66,23 +65,20 @@
                     enc4 = 64;
                 }
                 output = output +
-                _keyStr.charAt(enc1) + _keyStr.charAt(enc2) +
-                _keyStr.charAt(enc3) + _keyStr.charAt(enc4);
+                keyStr.charAt(enc1) + keyStr.charAt(enc2) +
+                keyStr.charAt(enc3) + keyStr.charAt(enc4);
             }
             return output;
         };
 
         this.base64_decode = function (input) {
-            var output = "";
-            var chr1, chr2, chr3;
-            var enc1, enc2, enc3, enc4;
-            var i = 0;
+            var output = '', chr1, chr2, chr3, enc1, enc2, enc3, enc4, i = 0;
             input = input.replace(/[^A-Za-z0-9\+\/\=]/g, '');
             while (i < input.length) {
-                enc1 = _keyStr.indexOf(input.charAt(i++));
-                enc2 = _keyStr.indexOf(input.charAt(i++));
-                enc3 = _keyStr.indexOf(input.charAt(i++));
-                enc4 = _keyStr.indexOf(input.charAt(i++));
+                enc1 = keyStr.indexOf(input.charAt(i++));
+                enc2 = keyStr.indexOf(input.charAt(i++));
+                enc3 = keyStr.indexOf(input.charAt(i++));
+                enc4 = keyStr.indexOf(input.charAt(i++));
                 chr1 = (enc1 << 2) | (enc2 >> 4);
                 chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
                 chr3 = ((enc3 & 3) << 6) | enc4;
@@ -114,28 +110,46 @@
         };
 
         this.buildQueryString = function(parameters) {
-            var qs = '';
-            for(var key in parameters) {
-                var value = parameters[key];
-                qs += encodeURIComponent(key) + '=' + encodeURIComponent(value) + '&';
+            var qs = '', key, keyString, skipKey, i, len;
+
+            for (key in parameters) {
+                if (parameters.hasOwnProperty(key)) {
+                    skipKey = false;
+                    keyString = String(key);
+
+                    for (i = 0, len = keyString.length; i < len; i += 1) {
+                        if (keyString.charCodeAt(i) > 255) {
+                            skipKey = true;
+                            break;
+                        }
+                    }
+
+                    if (skipKey) {
+                        continue;
+                    }
+
+                    qs += encodeURIComponent(key) + '=' + encodeURIComponent(parameters[key]) + '&';
+                }
             }
-            if (qs.length > 0){
-                qs = qs.substring(0, qs.length-1); //chop off last "&"
+
+            if (0 < qs.length){
+                qs = qs.substring(0, qs.length - 1); //chop off last "&"
             }
+
             return qs;
         };
 
         this.buildHashParams = function(params) {
             return this.base64_encode(this.buildQueryString(params));
-        }
+        };
 
         this.parseHashParams = function(hash) {
             return this.parseQueryString(this.base64_decode(hash));
-        }
+        };
 
         return this;
     })();
 
-    exports.EncoderTools = EncoderTools;
+    exports.EncoderTools = encoderTools;
 
 })(window);
