@@ -1,24 +1,61 @@
-(function (exports, $) {
+(function (window, exports, $, EncoderTools) {
+    "use strict";
 
-    var HeightPublisher = (function () {
+    var heightPublisher = (function () {
 
-        /**
-         * @type {Number}|null frame id for this frame
-         */
-        var currentFrameId = null;
+        /** @type {Number}|null frame id for this frame */
+        var currentFrameId = null,
 
-        /**
-         * @type {String} Name of the cookie storing the latest parameters
-         */
-        var cookieName = 'HeightPublisher';
+            /** @type {String} Name of the cookie storing the latest parameters */
+            cookieName = 'HeightPublisher',
 
-        /**
-         * @type {Object} Persistence options for the cookie
-         */
-        var cookieOptions = {
-            expires: 7,
-            path: '/'
-        };
+            /** @type {Object} Persistence options for the cookie */
+            cookieOptions = {
+                expires: 7,
+                path: '/'
+            },
+
+            /**
+             * Retrieves the current frame id (frame id is assigned by parent window)
+             *
+             * @return {Number}|null
+             */
+            getFrameId = function () {
+                var qs = this.read();
+                if (qs.frameId) {
+                    currentFrameId = qs.frameId;
+                }
+                return currentFrameId;
+            },
+
+            /**
+             * Retrieves the body height
+             *
+             * @return {Number}
+             */
+            getBodyHeight = function () {
+                return $(window.document.body).outerHeight();
+            },
+
+            /**
+             * Retrieves the viewport height
+             *
+             * @return {Number}
+             */
+            getViewPortHeight = function () {
+                var height = 0;
+                if (window.innerHeight) {
+                    height = window.innerHeight - 18;
+                } else if (
+                    window.document.documentElement &&
+                        window.document.documentElement.clientHeight
+                ) {
+                    height = window.document.documentElement.clientHeight;
+                } else if (window.document.body && window.document.body.clientHeight) {
+                    height = window.document.body.clientHeight;
+                }
+                return height;
+            };
 
         this.getHashParams = function (params) {
             params = params || {};
@@ -33,16 +70,17 @@
          */
         this.publish = function (params) {
             params = params || {};
-            var hashParams = this.read();
-            if (!hashParams['lastLocation']) {
+            var hashString,
+                hashParams = this.read();
+            if (!hashParams.lastLocation) {
                 return false;
             }
-            var hashString = this.getHashParams(params);
-            if(!hashString) {
+            hashString = this.getHashParams(params);
+            if (!hashString) {
                 return false;
             }
             $.cookie(cookieName, hashString, cookieOptions);
-            window.parent.location = hashParams['lastLocation'] + '#' + hashString;
+            window.parent.location = hashParams.lastLocation + '#' + hashString;
             return true;
         };
 
@@ -53,7 +91,7 @@
          */
         this.read = function () {
             var hashParams = EncoderTools.parseHashParams(window.location.hash.substring(1));
-            if (!hashParams['lastLocation']) {
+            if (!hashParams.lastLocation) {
                 hashParams = EncoderTools.parseHashParams($.cookie(cookieName) || "");
             }
             return hashParams;
@@ -63,70 +101,28 @@
          * Sends the current height to the parent window via hash parameters
          */
         this.publishHeight = function () {
-            var frameId = getFrameId();
+            var actualHeight, currentHeight, frameId = getFrameId();
             if (!frameId) {
                 return;
             }
-            var actualHeight = getBodyHeight();
-            var currentHeight = getViewPortHeight();
+            actualHeight = getBodyHeight();
+            currentHeight = getViewPortHeight();
             if (Math.abs(actualHeight / currentHeight - 1) > 0.05) {
                 this.publish({
-                    height:actualHeight.toString()
+                    height: actualHeight.toString()
                 });
             }
         };
 
-        /**
-         * Retrieves the current frame id (frame id is assigned by parent window)
-         *
-         * @return {Number}|null
-         */
-        var getFrameId = function () {
-            var qs = this.read();
-            if (qs['frameId']) {
-                currentFrameId = qs['frameId'];
-            }
-            return currentFrameId;
-        };
-
-        /**
-         * Retrieves the body height
-         *
-         * @return {Number}
-         */
-        var getBodyHeight = function () {
-            return $(document.body).outerHeight();
-        };
-
-        /**
-         * Retrieves the viewport height
-         *
-         * @return {Number}
-         */
-        var getViewPortHeight = function () {
-            var height = 0;
-            if (window.innerHeight) {
-                height = window.innerHeight - 18;
-            } else if (
-                document.documentElement
-                    && document.documentElement.clientHeight
-                ) {
-                height = document.documentElement.clientHeight;
-            } else if (document.body && document.body.clientHeight) {
-                height = document.body.clientHeight;
-            }
-            return height;
-        };
-
         return this;
 
-    })();
+    }());
 
     $(function () {
 
         // Sending height publish notifications to parent window
         var publishHeight = function () {
-            HeightPublisher.publishHeight();
+            heightPublisher.publishHeight();
             window.setTimeout(publishHeight, 500);
         };
         // First publishing is delayed in case parent window isn't ready yet
@@ -135,27 +131,20 @@
         // Propagating hash parameters through pages
         $("a").live(
             "click",
-            function(e) {
-                var $a = $(this);
-                var href = $a.attr('href');
-                var params = HeightPublisher.getHashParams();
-                if (
-                    href
-                    && params
-                    && (
-                        !$a.attr('target')
-                        || ($a.attr('target') === '_self')
-                    )
-                    && (href.indexOf("#") < 0)
-                ) {
+            function (e) {
+                var a = $(this),
+                    href = a.attr('href'),
+                    params = heightPublisher.getHashParams(),
+                    targetSelf = !a.attr('target') || ('_self' === a.attr('target'));
+                if (href && params && targetSelf && href.indexOf("#")) {
                     e.preventDefault();
-                    document.location.href = href +  "#" + params;
+                    window.document.location.href = href +  "#" + params;
                 }
             }
         );
 
     });
 
-    exports.HeightPublisher = HeightPublisher;
+    exports.HeightPublisher = heightPublisher;
 
-})(window, jQuery);
+}(window, window, jQuery, EncoderTools));
