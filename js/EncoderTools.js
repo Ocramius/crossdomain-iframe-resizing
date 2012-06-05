@@ -110,8 +110,7 @@
                         return "";
                     }
                 },
-                key,
-                value;
+                key;
 
             e = r.exec(qs);
             while (e) {
