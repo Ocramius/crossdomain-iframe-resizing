@@ -1,42 +1,41 @@
 (function (exports) {
-
     exports.EncoderTools = (function () {
 
         var keyStr = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
 
         this.utf8_encode = function (string) {
-            var utftext = '', n, c, str;
+            var utfText = '', n, c, str;
             str = string.replace(/\r\n/g, "\n");
             for (n = 0; n < str.length; n += 1) {
                 c = str.charCodeAt(n);
                 if (c < 128) {
-                    utftext += String.fromCharCode(c);
+                    utfText += String.fromCharCode(c);
                 } else if ((c > 127) && (c < 2048)) {
-                    utftext += String.fromCharCode((c >> 6) | 192);
-                    utftext += String.fromCharCode((c & 63) | 128);
+                    utfText += String.fromCharCode((c >> 6) | 192);
+                    utfText += String.fromCharCode((c & 63) | 128);
                 } else {
-                    utftext += String.fromCharCode((c >> 12) | 224);
-                    utftext += String.fromCharCode(((c >> 6) & 63) | 128);
-                    utftext += String.fromCharCode((c & 63) | 128);
+                    utfText += String.fromCharCode((c >> 12) | 224);
+                    utfText += String.fromCharCode(((c >> 6) & 63) | 128);
+                    utfText += String.fromCharCode((c & 63) | 128);
                 }
             }
-            return utftext;
+            return utfText;
         };
 
-        this.utf8_decode = function (utftext) {
+        this.utf8_decode = function (utfText) {
             var c = 0, c2 = 0, c3, string = '', i = 0;
-            while (i < utftext.length) {
-                c = utftext.charCodeAt(i);
+            while (i < utfText.length) {
+                c = utfText.charCodeAt(i);
                 if (c < 128) {
                     string += String.fromCharCode(c);
                     i += 1;
                 } else if ((c > 191) && (c < 224)) {
-                    c2 = utftext.charCodeAt(i + 1);
+                    c2 = utfText.charCodeAt(i + 1);
                     string += String.fromCharCode(((c & 31) << 6) | (c2 & 63));
                     i += 2;
                 } else {
-                    c2 = utftext.charCodeAt(i + 1);
-                    c3 = utftext.charCodeAt(i + 2);
+                    c2 = utfText.charCodeAt(i + 1);
+                    c3 = utfText.charCodeAt(i + 2);
                     string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
                     i += 3;
                 }
@@ -87,10 +86,10 @@
                 chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
                 chr3 = ((enc3 & 3) << 6) | enc4;
                 output += String.fromCharCode(chr1);
-                if (enc3 !== 64) {
+                if (64 !== enc3) {
                     output += String.fromCharCode(chr2);
                 }
-                if (enc4 !== 64) {
+                if (64 !== enc4) {
                     output += String.fromCharCode(chr3);
                 }
             }
@@ -104,12 +103,23 @@
                 a = /\+/g,  // Regex for replacing addition symbol with a space
                 r = /([^&=]+)=?([^&]*)/g,
                 d = function (s) {
-                    return decodeURIComponent(s.replace(a, " "));
-                };
+                    try {
+                        var toDecode = s.replace(a, " ");
+                        return decodeURIComponent(toDecode);
+                    } catch (e) {
+                        return "";
+                    }
+                },
+                key,
+                value;
+
             e = r.exec(qs);
             while (e) {
                 if (e[2]) {
-                    urlParams[d(e[1])] = d(e[2]);
+                    key = d(e[1]);
+                    if (key) {
+                        urlParams[key] = d(e[2]);
+                    }
                 }
                 e = r.exec(qs);
             }
@@ -125,7 +135,7 @@
                     keyString = String(key);
 
                     for (i = 0, len = keyString.length; i < len; i += 1) {
-                        if (keyString.charCodeAt(i) > 255) {
+                        if (255 < keyString.charCodeAt(i)) {
                             skipKey = true;
                             break;
                         }
@@ -135,7 +145,12 @@
                         continue;
                     }
 
-                    qs += encodeURIComponent(key) + '=' + encodeURIComponent(parameters[key]) + '&';
+                    try {
+                        qs += encodeURIComponent(key) + '=' + encodeURIComponent(parameters[key]) + '&';
+                    } catch (e) {
+                        // in case strings couldn't be encoded
+                        qs += "";
+                    }
                 }
             }
 
@@ -147,11 +162,13 @@
         };
 
         this.buildHashParams = function (params) {
-            return this.base64_encode(this.buildQueryString(params));
+            var queryString = this.buildQueryString(params);
+            return this.base64_encode(queryString);
         };
 
         this.parseHashParams = function (hash) {
-            return this.parseQueryString(this.base64_decode(hash));
+            var decoded = this.base64_decode(hash);
+            return this.parseQueryString(decoded);
         };
 
         return this;
